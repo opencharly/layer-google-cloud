@@ -10,27 +10,18 @@ google-cloud:
             every shell finds them. Each CLI answers its own version
             subcommand, which is what these scenarios assert.
         plan:
-            - run: |
-                command=curl -fsSL "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz" \
-                  -o /tmp/google-cloud-sdk.tar.gz
-                mkdir -p /var/opt
-                tar -xzf /tmp/google-cloud-sdk.tar.gz -C /var/opt/
-                rm -f /tmp/google-cloud-sdk.tar.gz
+            - run: download the Google Cloud CLI tarball (the declarative download verb — content-addressed /tmp/downloads cache, atomic .part to mv rename, stage-user-correct cache mount)
+              download: "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
+              extract: tar.gz
+              to: /var/opt
+              run_as: root
+            - run: run the bundled install.sh and symlink the CLIs onto PATH
+              command: |
                 /var/opt/google-cloud-sdk/install.sh --quiet --usage-reporting false --command-completion false --path-update false
                 for cmd in gcloud gsutil bq; do
                   ln -sf /var/opt/google-cloud-sdk/bin/$cmd /usr/bin/$cmd
                 done
               run_as: root
-              command: |
-                curl -fsSL "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz" \
-                  -o /tmp/google-cloud-sdk.tar.gz
-                mkdir -p /var/opt
-                tar -xzf /tmp/google-cloud-sdk.tar.gz -C /var/opt/
-                rm -f /tmp/google-cloud-sdk.tar.gz
-                /var/opt/google-cloud-sdk/install.sh --quiet --usage-reporting false --command-completion false --path-update false
-                for cmd in gcloud gsutil bq; do
-                  ln -sf /var/opt/google-cloud-sdk/bin/$cmd /usr/bin/$cmd
-                done
             - check: the gcloud CLI is symlinked onto PATH
               file:
                 file: /usr/bin/gcloud
