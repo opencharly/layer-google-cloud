@@ -1,7 +1,5 @@
-version: 2026.232.0520
 google-cloud:
     candy:
-        version: 2026.144.1443
         description: |
             Google Cloud SDK ships the gcloud, gsutil and bq CLIs on PATH
             The candy downloads the official Google Cloud CLI x86_64 tarball,
